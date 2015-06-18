@@ -15,6 +15,10 @@ body {
 	border: 1px solid #ca0000;
 }
 
+.circle.adjusted {
+	border: 1px solid #12a;
+}
+
 .point {
 	position: absolute;
 	border-radius: 4px;
@@ -25,7 +29,7 @@ body {
 }
 
 .point:after {
-	content: attr(data-label);
+	/*content: attr(data-label);*/
 	color: #696969;
 	transform: translate(10px, -50%);
 	position: absolute;

@@ -51,7 +51,9 @@ function createPoints () {
 
     points = [];
 
-    var len = Math.floor((1 - Math.sqrt(Math.random())) * 60) + 25;  // 2 to 20, preferring smaller numbers
+    var multiplier = Math.round(30 * width / 350);
+
+    var len = Math.floor((1 - Math.sqrt(Math.random())) * multiplier) + 15;  // 2 to 20, preferring smaller numbers
 
     for (var i = 0; i < len; i++) {
 		var r = randomGaussianPair();
@@ -82,8 +84,10 @@ function defineClusters (_points) {
         return Math.sqrt(total);
     }
 
+    var threshold = Math.min($('.container').width() / 4, 110);
+
     // Find high-level clusters, with a threshold fixed around 150px
-    var clusters = clusterfck.hcluster(JSON.parse(JSON.stringify(_points)), distance, null, 150);
+    var clusters = clusterfck.hcluster(JSON.parse(JSON.stringify(_points)), distance, "complete", threshold);
 
     // Recursively pull out the values from each nested cluster object
     function flattenCluster (data) {
@@ -115,42 +119,40 @@ function defineClusters (_points) {
     }
 
     // Map clusters to an object with a flat array of places and the smallest enclosing circle
-    clusters = _.map(clusters, function (cluster) {
-        var newCluster = {
-            points: flattenCluster(cluster)
+    clusters = _.map(clusters, function (_cluster) {
+        var cluster = {
+            points: flattenCluster(_cluster)
         };
 
-        if (newCluster.points.length > 1) {
-            newCluster.circle = findSmallestCircle(newCluster.points);
+        if (cluster.points.length > 1) {
+            cluster.circle = findSmallestCircle(cluster.points);
 
-            newCluster.points = _.map(newCluster.points, function (d) {
-                d.cx = newCluster.circle.x;
-                d.cy = newCluster.circle.y;
-                d.cr = newCluster.circle.r;
-            })
+            if ($('.container').width() - cluster.circle.x < cluster.circle.r * 2) {
+                console.log("right collision!");
+                cluster.adjustedcircle = {};
+                cluster.adjustedcircle.r = $('.container').width() - (cluster.circle.x - cluster.circle.r);
+                cluster.adjustedcircle.x = $('.container').width();
+                cluster.adjustedcircle.y = cluster.circle.y;
+            }
 
-            // if ($('.container').width() - newCluster.circle.x < newCluster.circle.r * 2) {
-            //     console.log("right collision!");
-            //     newCluster.circle.x = $('.container').width();
-            //     newCluster.circle.r = newCluster.circle.r + ($('.container').width() - (newCluster.circle.x - newCluster.circle.r));
-            // }
-            //
-            // if (newCluster.circle.x < newCluster.circle.r * 2) {
-            //     console.log("left collision!");
-            //     newCluster.circle.x = 0;
-            //     newCluster.circle.r = newCluster.circle.r + (newCluster.circle.x + newCluster.circle.r);
-            // }
-            //
-            // if (newCluster.circle.y < newCluster.circle.r * 2) {
-            //     console.log("top collision!");
-            // }
-            //
-            // if ($('.container').height() - newCluster.circle.y < newCluster.circle.r * 2) {
-            //     console.log("bottom collision!");
-            // }
+            if (cluster.circle.x < cluster.circle.r * 2) {
+                console.log("left collision!");
+                cluster.adjustedcircle = {};
+                cluster.adjustedcircle.r = cluster.circle.x + cluster.circle.r;
+                cluster.adjustedcircle.x = 0;
+                cluster.adjustedcircle.y = cluster.circle.y;
+            }
+
+            if (cluster.circle.y < cluster.circle.r * 2) {
+                console.log("top collision!");
+            }
+
+            if ($('.container').height() - cluster.circle.y < cluster.circle.r * 2) {
+                console.log("bottom collision!");
+            }
         }
 
-        return newCluster;
+        return cluster;
     });
 
     renderClusters(clusters);
@@ -162,27 +164,10 @@ function renderClusters (_clusters) {
     var height = $('.container').height();
 
     var actualClusters = _.filter(_clusters, function (cluster) {
-        return cluster.points.length > 2;
+        return cluster.points.length > 1;
     })
 
     var circles = d3.select('.container').selectAll('.circle').data(actualClusters);
-
-    circles
-        .style('top', function (d) {
-            return d.circle.y - d.circle.r + 'px';
-        })
-        .style('left', function (d) {
-            return d.circle.x - d.circle.r + 'px';
-        })
-        .style('border-radius', function (d) {
-            return d.circle.r + 'px';
-        })
-        .style('width', function (d) {
-            return d.circle.r * 2 + 'px'
-        })
-        .style('height', function (d) {
-            return d.circle.r * 2 + 'px'
-        });
 
     circles.enter()
         .append('div')
@@ -201,6 +186,28 @@ function renderClusters (_clusters) {
         })
         .style('height', function (d) {
             return d.circle.r * 2 + 'px'
+        })
+        .each(function (d) {
+            if (d.adjustedcircle) {
+                d3.select('.container')
+                    .append('div')
+                    .attr('class', 'circle adjusted')
+                    .style('top', function () {
+                        return d.adjustedcircle.y - d.adjustedcircle.r + 'px';
+                    })
+                    .style('left', function () {
+                        return d.adjustedcircle.x - d.adjustedcircle.r + 'px';
+                    })
+                    .style('border-radius', function () {
+                        return d.adjustedcircle.r + 'px';
+                    })
+                    .style('width', function () {
+                        return d.adjustedcircle.r * 2 + 'px'
+                    })
+                    .style('height', function () {
+                        return d.adjustedcircle.r * 2 + 'px'
+                    })
+            }
         })
         .style('opacity', 0)
         .transition()
