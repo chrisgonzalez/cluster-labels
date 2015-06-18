@@ -1,0 +1,14 @@
+#ignore thumbnails created by windows
+Thumbs.db
+[Bb]in
+[Dd]ebug*/
+*.lib
+*.sbr
+obj/
+[Rr]elease*/
+_ReSharper*/
+[Tt]est[Rr]esult*
+*.DS_Store
+**/node_modules/*
+**.sass-cache/*
+*npm-debug.log
