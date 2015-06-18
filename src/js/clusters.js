@@ -145,10 +145,18 @@ function defineClusters (_points) {
 
             if (cluster.circle.y < cluster.circle.r * 2) {
                 console.log("top collision!");
+                cluster.adjustedcircle = {};
+                cluster.adjustedcircle.r = cluster.circle.y + cluster.circle.r;
+                cluster.adjustedcircle.x = cluster.circle.x;
+                cluster.adjustedcircle.y = 0;
             }
 
             if ($('.container').height() - cluster.circle.y < cluster.circle.r * 2) {
                 console.log("bottom collision!");
+                cluster.adjustedcircle = {};
+                cluster.adjustedcircle.r = $('.container').height() - (cluster.circle.y - cluster.circle.r);
+                cluster.adjustedcircle.x = cluster.circle.x;
+                cluster.adjustedcircle.y = $('.container').height();
             }
         }
 
