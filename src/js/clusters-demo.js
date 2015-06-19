@@ -209,40 +209,6 @@ function renderClusters (_clusters) {
         });
 }
 
-function renderPoints (_points) {
-
-    var points = d3.select(".container").selectAll("div.place").data(_points);
-
-    //random store for a depth while messing around
-    var depth = 0;
-
-
-    points
-        .style("transform", function(d) {
-            return "translate3d( "+d.x + "px, " + d.y + "px, 0px)";
-        })
-
-    points
-        .enter()
-            .append("div")
-            .attr("class", "point")
-            .attr('data-label', function (d) {
-                return d.label
-            })
-            .style("transform", function (d) {
-                return "translate3d( "+d.x + "px, " + d.y + "px, 0px)";
-            })
-            .style('opacity', 0)
-            .transition()
-            .duration(700)
-            .style('opacity', 1);
-
-    points
-        .exit()
-            .remove("div");
-
-}
-
 domready(function () {
     var points = createPoints();
     clusters = defineClusters(points)

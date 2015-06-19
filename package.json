@@ -1,0 +1,14 @@
+{
+  "name": "cluster-labels",
+  "version": "1.0.0",
+  "description": "Cluster Labels Client-Side code",
+  "main": "src/index.html",
+  "scripts": {
+    "build": "buildify"
+  },
+  "author": "Chris Gonzalez",
+  "license": "ISC",
+  "dependencies": {
+    "buildify": "^0.4.0"
+  }
+}

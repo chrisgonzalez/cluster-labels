@@ -12,6 +12,7 @@ body {
 }
 
 .circle {
+	/*display: none;*/
 	position: absolute;
 	border: 1px solid #ca0000;
 }
