@@ -8,6 +8,8 @@ This plugin will help you!
 
 By analyzing an array of points (with .x and. y properties), it will divide your data into an array of clusters. For clusters of more than 2 points, it will calculate an enclosing circle and provide a label position for each point outside of the circle circumfrence. By passing a DOM container in, you also get boundary detection, making sure your labels will be placed within the bounds of the container.
 
+[Check out the demo!](http://chrisgonzalez.github.io/cluster-labels/)
+
 ## Usage
 
 defineClusters(pointsArray, '.container');
