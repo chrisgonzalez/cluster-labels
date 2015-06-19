@@ -72,6 +72,7 @@ function defineClusters (_points, _container, _threshold) {
         if (cluster.points.length > 1) {
             cluster.circle = findSmallestCircle(cluster.points);
 
+            //  Detect collisions with edge of container
             //  collisions:  [top, right, bottom, left]
             var collisions = [0, 0, 0, 0];
 
@@ -93,79 +94,128 @@ function defineClusters (_points, _container, _threshold) {
 
             collisions = collisions.join(' ');
 
+            // If there are collisions, calculate adjusted circle
             if (collisions.indexOf('1') > -1) {
-                cluster.adjustedcircle = {};
+                cluster.adjusted = {};
+                cluster.adjusted.circle = {};
             }
 
             switch (collisions) {
                 case '1 0 0 0':
                     console.log("top collision!");
-                    cluster.adjustedcircle.r = cluster.circle.y + cluster.circle.r;
-                    cluster.adjustedcircle.x = cluster.circle.x;
-                    cluster.adjustedcircle.y = 0;
+                    cluster.adjusted.circle.r = cluster.circle.y + cluster.circle.r;
+                    cluster.adjusted.circle.x = cluster.circle.x;
+                    cluster.adjusted.circle.y = 0;
                     break;
                 case '0 1 0 0':
                     console.log("right collision!");
-                    cluster.adjustedcircle.r = width - (cluster.circle.x - cluster.circle.r);
-                    cluster.adjustedcircle.x = width;
-                    cluster.adjustedcircle.y = cluster.circle.y;
+                    cluster.adjusted.circle.r = width - (cluster.circle.x - cluster.circle.r);
+                    cluster.adjusted.circle.x = width;
+                    cluster.adjusted.circle.y = cluster.circle.y;
                     break;
                 case '0 0 1 0':
                     console.log("bottom collision!");
-                    cluster.adjustedcircle.r = height - (cluster.circle.y - cluster.circle.r);
-                    cluster.adjustedcircle.x = cluster.circle.x;
-                    cluster.adjustedcircle.y = height;
+                    cluster.adjusted.circle.r = height - (cluster.circle.y - cluster.circle.r);
+                    cluster.adjusted.circle.x = cluster.circle.x;
+                    cluster.adjusted.circle.y = height;
                     break;
                 case '0 0 0 1':
                     console.log("left collision!");
-                    cluster.adjustedcircle.r = cluster.circle.x + cluster.circle.r;
-                    cluster.adjustedcircle.x = 0;
-                    cluster.adjustedcircle.y = cluster.circle.y;
+                    cluster.adjusted.circle.r = cluster.circle.x + cluster.circle.r;
+                    cluster.adjusted.circle.x = 0;
+                    cluster.adjusted.circle.y = cluster.circle.y;
                     break;
                 case '1 1 0 0':
                     console.log("top right collision!");
                     var corner = {};
                     corner.x = cluster.circle.x + cluster.circle.r * Math.cos(3 * Math.PI / 4);
                     corner.y = cluster.circle.y + cluster.circle.r * Math.sin(3 * Math.PI / 4);
-                    cluster.adjustedcircle.x = width;
-                    cluster.adjustedcircle.y = 0;
-                    cluster.adjustedcircle.r = Math.round(distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner));
-                    console.log("Distance: ", distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner), "Points: ", corner, cluster.adjustedcircle);
+                    cluster.adjusted.circle.x = width;
+                    cluster.adjusted.circle.y = 0;
+                    cluster.adjusted.circle.r = Math.round(distance({x: cluster.adjusted.circle.x, y: cluster.adjusted.circle.y}, corner));
                     break;
                 case '1 0 0 1':
                     console.log("top left collision!");
                     var corner = {};
                     corner.x = cluster.circle.x + cluster.circle.r * Math.cos(Math.PI / 4);
                     corner.y = cluster.circle.y + cluster.circle.r * Math.sin(Math.PI / 4);
-                    cluster.adjustedcircle.x = 0;
-                    cluster.adjustedcircle.y = 0;
-                    cluster.adjustedcircle.r = Math.round(distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner));
-                    console.log("Distance: ", distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner), "Points: ", corner, cluster.adjustedcircle);
+                    cluster.adjusted.circle.x = 0;
+                    cluster.adjusted.circle.y = 0;
+                    cluster.adjusted.circle.r = Math.round(distance({x: cluster.adjusted.circle.x, y: cluster.adjusted.circle.y}, corner));
                     break;
                 case '0 1 1 0':
                     console.log("bottom right collision!");
                     var corner = {};
                     corner.x = cluster.circle.x + cluster.circle.r * Math.cos(5 * Math.PI / 4);
                     corner.y = cluster.circle.y + cluster.circle.r * Math.sin(5 * Math.PI / 4);
-                    cluster.adjustedcircle.x = width;
-                    cluster.adjustedcircle.y = height;
-                    cluster.adjustedcircle.r = Math.round(distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner));
-                    console.log("Distance: ", distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner), "Points: ", corner, cluster.adjustedcircle);
+                    cluster.adjusted.circle.x = width;
+                    cluster.adjusted.circle.y = height;
+                    cluster.adjusted.circle.r = Math.round(distance({x: cluster.adjusted.circle.x, y: cluster.adjusted.circle.y}, corner));
                     break;
                 case '0 0 1 1':
                     console.log("bottom left collision!");
                     var corner = {};
                     corner.x = cluster.circle.x + cluster.circle.r * Math.cos(7 * Math.PI / 4);
                     corner.y = cluster.circle.y + cluster.circle.r * Math.sin(7 * Math.PI / 4);
-                    cluster.adjustedcircle.x = 0;
-                    cluster.adjustedcircle.y = height;
-                    cluster.adjustedcircle.r = Math.round(distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner));
-                    console.log("Distance: ", distance({x: cluster.adjustedcircle.x, y: cluster.adjustedcircle.y}, corner), "Points: ", corner, cluster.adjustedcircle);
+                    cluster.adjusted.circle.x = 0;
+                    cluster.adjusted.circle.y = height;
+                    cluster.adjusted.circle.r = Math.round(distance({x: cluster.adjusted.circle.x, y: cluster.adjusted.circle.y}, corner));
                     break;
             }
 
-        } else {
 
+            function calculateLabelPosition (point, circle, useDefaultRadius) {
+                point.label = {};
+
+                // calculate radian angle of point offset from center of circle
+                var theta = Math.atan2(point.y - circle.y, point.x - circle.x);
+
+                // if theta came back as a negative angle, make it positive
+                if (theta < 0) { theta = 2 * Math.PI + theta; }
+
+                if (theta <= 3 * Math.PI / 8 || theta >= 13 * Math.PI / 8) {
+                    // place right
+                    point.label.position = 'right';
+                } else if (theta > 3 * Math.PI / 8 && theta < 6 * Math.PI / 8) {
+                    // place below
+                    point.label.position = 'bottom';
+                } else if (theta >= 6 * Math.PI / 8 && theta < 12 * Math.PI / 8) {
+                    // place left
+                    point.label.position = 'left';
+                } else if (theta >= 12 * Math.PI / 8 && theta < 13 * Math.PI / 8) {
+                    // place top
+                    point.label.position = 'top';
+                }
+
+                var boost = 10;
+
+                if (useDefaultRadius) { boost = 0 }
+
+                point.label.angle = theta,
+                point.label.x = circle.x + (circle.r + boost) * Math.cos(theta),
+                point.label.y = circle.y + (circle.r + boost) * Math.sin(theta)
+
+                return point;
+            }
+
+            // if there are collisions, align all points based on the edge
+
+            cluster.points = cluster.points.map(function (d) {
+                if (cluster.adjusted) {
+                    return calculateLabelPosition(d, cluster.adjusted.circle);
+                } else {
+                    return calculateLabelPosition(d, cluster.circle);
+                }
+            });
+
+        } else {
+            cluster.points = cluster.points.map(function (d) {
+                var circle = {};
+                circle.x = width - d.x < 150 ? d.x + 1 : d.x - 1;
+                circle.y = d.y;
+                circle.r = 1;
+                return calculateLabelPosition(d, circle, true)
+            })
         }
 
         return cluster;

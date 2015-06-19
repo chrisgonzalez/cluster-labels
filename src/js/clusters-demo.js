@@ -1,5 +1,6 @@
-/**************************************** DESCRIPTION *********************************************
+/**************************************** DESCRIPTION *********************************************/
 
+var clusters;
 
 //**************************************** RENDER FUNCTIONS ***************************************/
 
@@ -19,9 +20,15 @@ function createPoints () {
     }
 
     function randomString(length) {
-        chars = 'isthi sreal yathingtha tyoucan sayyoud idbut idi dntdoi ttoo';
+        chars = 'delicious tacos are for eating lettuce is rabbit goat salsa cheese street Kyle';
+        chars = chars.split(' ');
         var result = '';
-        for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+        for (var i = length; i > 0; --i) {
+            result += chars[Math.round(Math.random() * (chars.length - 1))];
+            if (i > 1) {
+                result += ' ';
+            }
+        }
         return result;
     }
 
@@ -46,7 +53,7 @@ function createPoints () {
 		points.push({
 			x: r[0] * scale * 0.4 + width  / 2,
 			y: r[1] * scale * 0.4 + height / 2,
-            label: randomString(5 + Math.round(Math.random() * 15))
+            labelText: randomString(1 + Math.round(Math.random() * 3))
         });
 	}
 
@@ -91,26 +98,34 @@ function renderClusters (_clusters) {
             return d.circle.r * 2 + 'px'
         })
         .each(function (d) {
-            if (d.adjustedcircle) {
+            if (d.adjusted) {
                 d3.select('.container')
                     .append('div')
                     .attr('class', 'circle adjusted')
                     .style('top', function () {
-                        return d.adjustedcircle.y - d.adjustedcircle.r + 'px';
+                        return d.adjusted.circle.y - d.adjusted.circle.r + 'px';
                     })
                     .style('left', function () {
-                        return d.adjustedcircle.x - d.adjustedcircle.r + 'px';
+                        return d.adjusted.circle.x - d.adjusted.circle.r + 'px';
                     })
                     .style('border-radius', function () {
-                        return d.adjustedcircle.r + 'px';
+                        return d.adjusted.circle.r + 'px';
                     })
                     .style('width', function () {
-                        return d.adjustedcircle.r * 2 + 'px'
+                        return d.adjusted.circle.r * 2 + 'px'
                     })
                     .style('height', function () {
-                        return d.adjustedcircle.r * 2 + 'px'
+                        return d.adjusted.circle.r * 2 + 'px'
                     })
+                    .style('opacity', 0)
+                    .transition()
+                    .delay(1000)
+                    .duration(1200)
+                    .style('opacity', 1);
             }
+
+
+
         })
         .style('opacity', 0)
         .transition()
@@ -120,6 +135,78 @@ function renderClusters (_clusters) {
 
     circles.exit()
         .remove();
+
+    d3.select('.container').append('svg');
+
+    var clusters = d3.select('.container svg').selectAll('.cluster').data(_clusters);
+
+    clusters.enter()
+        .append('g')
+        .attr('class', 'cluster')
+        .each(function (d, i) {
+            var points = d3.select(this).selectAll('.point').data(d.points);
+
+            points.enter()
+                .append('circle')
+                .attr('r', 2)
+                .attr('cx', function (d) {
+                    return d.x;
+                })
+                .attr('cy', function (d) {
+                    return d.y;
+                })
+
+            var lines = d3.select(this).selectAll('.label').data(d.points);
+
+            lines.enter()
+                .append('line')
+                .attr('x1', function (d) {
+                    return d.x;
+                })
+                .attr('x2',  function (d, i) {
+                    return d.label.x;
+                })
+                .attr('y1',  function (d, i) {
+                    return d.y;
+                })
+                .attr('y2',  function (d, i) {
+                    return d.label.y;
+                })
+
+            var labels = d3.select(this).selectAll('.label').data(d.points);
+
+            labels.enter()
+                .append('text')
+                .attr('x', function (d) {
+                    return d.label.x;
+                })
+                .attr('y', function (d) {
+                    return d.label.y;
+                })
+                .attr('text-anchor',  function (d, i) {
+                    if (d.label.position === "top" || d.label.position === "bottom") {
+                        return "middle";
+                    } else if (d.label.position === "left") {
+                        return "end";
+                    } else {
+                        return "start";
+                    }
+                })
+                .attr('transform', function (d) {
+                    if (d.label.position === 'bottom') {
+                        return 'translate(0, 10)';
+                    } else if (d.label.position === 'left') {
+                        return 'translate(-5, 2)';
+                    } else if (d.label.position === 'right') {
+                        return 'translate(5, 2)';
+                    } else {
+                        return 'translate(0, -5)';
+                    }
+                })
+                .text(function (d) {
+                    return d.labelText;
+                })
+        });
 }
 
 function renderPoints (_points) {
@@ -158,7 +245,8 @@ function renderPoints (_points) {
 
 domready(function () {
     var points = createPoints();
+    clusters = defineClusters(points)
 
-    renderClusters(defineClusters(points));
-    renderPoints(points);
+    renderClusters(clusters);
+    // renderPoints(points);
 })
