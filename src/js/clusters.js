@@ -163,8 +163,7 @@ function defineClusters (_points, _container, _threshold) {
                     break;
             }
 
-
-            function calculateLabelPosition (point, circle, useDefaultRadius) {
+            function calculateLabelAngles (point, circle) {
                 point.label = {};
 
                 // calculate radian angle of point offset from center of circle
@@ -173,16 +172,23 @@ function defineClusters (_points, _container, _threshold) {
                 // if theta came back as a negative angle, make it positive
                 if (theta < 0) { theta = 2 * Math.PI + theta; }
 
-                if (theta <= 3 * Math.PI / 8 || theta >= 13 * Math.PI / 8) {
+                point.label.angle = theta;
+
+                return point;
+            }
+
+
+            function calculateLabelPosition (point, circle, useDefaultRadius) {
+                if (point.label.angle <= 3 * Math.PI / 8 || point.label.angle >= 13 * Math.PI / 8) {
                     // place right
                     point.label.position = 'right';
-                } else if (theta > 3 * Math.PI / 8 && theta < 6 * Math.PI / 8) {
+                } else if (point.label.angle > 3 * Math.PI / 8 && point.label.angle < 6 * Math.PI / 8) {
                     // place below
                     point.label.position = 'bottom';
-                } else if (theta >= 6 * Math.PI / 8 && theta < 12 * Math.PI / 8) {
+                } else if (point.label.angle >= 6 * Math.PI / 8 && point.label.angle < 12 * Math.PI / 8) {
                     // place left
                     point.label.position = 'left';
-                } else if (theta >= 12 * Math.PI / 8 && theta < 13 * Math.PI / 8) {
+                } else if (point.label.angle >= 12 * Math.PI / 8 && point.label.angle < 13 * Math.PI / 8) {
                     // place top
                     point.label.position = 'top';
                 }
@@ -191,14 +197,43 @@ function defineClusters (_points, _container, _threshold) {
 
                 if (useDefaultRadius) { boost = 0 }
 
-                point.label.angle = theta,
-                point.label.x = circle.x + (circle.r + boost) * Math.cos(theta),
-                point.label.y = circle.y + (circle.r + boost) * Math.sin(theta)
+                point.label.x = circle.x + (circle.r + boost) * Math.cos(point.label.angle),
+                point.label.y = circle.y + (circle.r + boost) * Math.sin(point.label.angle)
 
                 return point;
             }
 
             // if there are collisions, align all points based on the edge
+
+            cluster.points = cluster.points.map(function (d) {
+                if (cluster.adjusted) {
+                    return calculateLabelAngles(d, cluster.adjusted.circle);
+                } else {
+                    return calculateLabelAngles(d, cluster.circle);
+                }
+            });
+
+            function finessePoints (points) {
+                for (var i = 0; i < points.length; i++) {
+                    if (points[i].label.angle && i < points.length - 1) {
+                        if (points[i+1].label.angle - points[i].label.angle < Math.PI / 12) {
+                            points[i+1].label.angle += Math.PI / 12 - (points[i+1].label.angle - points[i].label.angle);
+                            console.log("finesse")
+                        }
+                    }
+                }
+            }
+
+            cluster.points.sort(function (a, b) {
+                if (a.label.angle > b.label.angle) {
+                    return 1;
+                } else if (a.label.angle < b.label.angle) {
+                    return -1;
+                }
+                return 0;
+            });
+
+            finessePoints(cluster.points);
 
             cluster.points = cluster.points.map(function (d) {
                 if (cluster.adjusted) {
@@ -209,6 +244,15 @@ function defineClusters (_points, _container, _threshold) {
             });
 
         } else {
+
+            cluster.points = cluster.points.map(function (d) {
+                var circle = {};
+                circle.x = width - d.x < 150 ? d.x + 1 : d.x - 1;
+                circle.y = d.y;
+                circle.r = 1;
+                return calculateLabelAngles(d, circle, true)
+            });
+
             cluster.points = cluster.points.map(function (d) {
                 var circle = {};
                 circle.x = width - d.x < 150 ? d.x + 1 : d.x - 1;
