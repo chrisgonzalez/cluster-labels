@@ -34,7 +34,7 @@ defineClusters(points, container, threshold)
 ### threshold
 ##### an integer for the maximum size of the clusters you'd like to identify
 
-	totally optional, defaults to 150 at largest sizes
+	totally optional, defaults to 110 at largest sizes
 
 
 # Returns
