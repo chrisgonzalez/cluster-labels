@@ -10,24 +10,29 @@ By analyzing an array of points (with .x and. y properties), it will divide your
 
 [Check out the demo!](http://chrisgonzalez.github.io/cluster-labels/)
 
+Special thanks to these fine folks for writing these awesome libraries:
+
+https://github.com/harthur/clusterfck
+http://www.nayuki.io/page/smallest-enclosing-circle
+
 # Usage
 
 ```
 defineClusters(points, container, threshold)
 ```
 
-## [points]
-### an array of objects, each containing an x and y property:
+### [points]
+##### an array of objects, each containing an x and y property:
 
 	{x: 200, y: 110} for example
     you can include any other data that is useful to you within these objects
     the keyword "label" is reserved though, and will be overwritten
 
-## "container"
-### a CSS selector string for your containing element
+### "container"
+##### a CSS selector string for your containing element
 
-## threshold
-### an integer for the maximum size of the clusters you'd like to identify
+### threshold
+##### an integer for the maximum size of the clusters you'd like to identify
 
 	totally optional, defaults to 150 at largest sizes
 
