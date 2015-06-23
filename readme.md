@@ -10,9 +10,9 @@ By analyzing an array of points (with .x and. y properties), it will divide your
 
 [Check out the demo!](http://chrisgonzalez.github.io/cluster-labels/)
 
-Special thanks to these fine folks for writing these awesome libraries:
+Special thanks to these fine folks for writing some awesomely useful libraries:
 
-https://github.com/harthur/clusterfck
+https://github.com/harthur/clusterfck  
 http://www.nayuki.io/page/smallest-enclosing-circle
 
 # Usage
