@@ -76,19 +76,19 @@ function defineClusters (_points, _container, _threshold) {
             //  collisions:  [top, right, bottom, left]
             var collisions = [0, 0, 0, 0];
 
-            if (width - cluster.circle.x < cluster.circle.r * 2) {
+            if (width - cluster.circle.x < cluster.circle.r * 2.5) {
                 collisions[1] = 1;
             }
 
-            if (cluster.circle.x < cluster.circle.r * 2) {
+            if (cluster.circle.x < cluster.circle.r * 2.5) {
                 collisions[3] = 1;
             }
 
-            if (cluster.circle.y < cluster.circle.r * 2) {
+            if (cluster.circle.y < cluster.circle.r * 2.5) {
                 collisions[0] = 1;
             }
 
-            if (height - cluster.circle.y < cluster.circle.r * 2) {
+            if (height - cluster.circle.y < cluster.circle.r * 2.5) {
                 collisions[2] = 1;
             }
 
