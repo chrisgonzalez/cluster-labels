@@ -70,9 +70,9 @@ buildify('src')
     }
 
     return content;
-})
-.changeDir('../')
-.save('index.html');
+});
+// .changeDir('../')
+// .save('index.html');
 
 
 for (var i = 0; i < scripts.length; i++) {

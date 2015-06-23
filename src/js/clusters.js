@@ -26,7 +26,7 @@ function defineClusters (_points, _container, _threshold) {
 
     // Compute distance threshold based on screen size, with a max threshold of 110px unless specified
 
-    var threshold = _threshold ? _threshold : Math.min(width / 4, 110);
+    var threshold = _threshold ? _threshold : Math.min(width / 3, 110);
 
     // Find high-level clusters, with a threshold fixed around 150px
 
