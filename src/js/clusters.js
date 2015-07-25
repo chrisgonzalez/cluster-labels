@@ -1,6 +1,6 @@
 /**************************************** CLUSTERS *********************************************/
 
-function defineClusters (_points, _container, _threshold) {
+function defineClusters (_points, _container, _threshold,  _boost, _variance) {
 
     var container = jbone('.container');
 
@@ -12,6 +12,8 @@ function defineClusters (_points, _container, _threshold) {
     var clientRect = container[0].getBoundingClientRect();
     var width = clientRect.width;
     var height = clientRect.height;
+
+    _boost = _boost ? _boost : 20;
 
     // Function to return the euclidian distance between each place
 
@@ -76,19 +78,19 @@ function defineClusters (_points, _container, _threshold) {
             //  collisions:  [top, right, bottom, left]
             var collisions = [0, 0, 0, 0];
 
-            if (width - cluster.circle.x < cluster.circle.r * 2.5) {
+            if (width - cluster.circle.x < (cluster.circle.r + _boost) * 2.5) {
                 collisions[1] = 1;
             }
 
-            if (cluster.circle.x < cluster.circle.r * 2.5) {
+            if (cluster.circle.x < (cluster.circle.r + _boost) * 2.5) {
                 collisions[3] = 1;
             }
 
-            if (cluster.circle.y < cluster.circle.r * 2.5) {
+            if (cluster.circle.y < (cluster.circle.r + _boost) * 2.5) {
                 collisions[0] = 1;
             }
 
-            if (height - cluster.circle.y < cluster.circle.r * 2.5) {
+            if (height - cluster.circle.y < (cluster.circle.r + _boost) * 2.5) {
                 collisions[2] = 1;
             }
 
@@ -179,26 +181,22 @@ function defineClusters (_points, _container, _threshold) {
 
 
             function calculateLabelPosition (point, circle, useDefaultRadius) {
-                if (point.label.angle <= 3 * Math.PI / 8 || point.label.angle >= 13 * Math.PI / 8) {
+                if (point.label.angle <= 3 * Math.PI / 9 || point.label.angle >= 13 * Math.PI / 9) {
                     // place right
                     point.label.position = 'right';
-                } else if (point.label.angle > 3 * Math.PI / 8 && point.label.angle < 6 * Math.PI / 8) {
+                } else if (point.label.angle > 3 * Math.PI / 9 && point.label.angle < 6 * Math.PI / 9) {
                     // place below
                     point.label.position = 'bottom';
-                } else if (point.label.angle >= 6 * Math.PI / 8 && point.label.angle < 12 * Math.PI / 8) {
+                } else if (point.label.angle >= 6 * Math.PI / 9 && point.label.angle < 12 * Math.PI / 9) {
                     // place left
                     point.label.position = 'left';
-                } else if (point.label.angle >= 12 * Math.PI / 8 && point.label.angle < 13 * Math.PI / 8) {
+                } else if (point.label.angle >= 12 * Math.PI / 9 && point.label.angle < 13 * Math.PI / 9) {
                     // place top
                     point.label.position = 'top';
                 }
 
-                var boost = 10;
-
-                if (useDefaultRadius) { boost = 0 }
-
-                point.label.x = circle.x + (circle.r + boost) * Math.cos(point.label.angle),
-                point.label.y = circle.y + (circle.r + boost) * Math.sin(point.label.angle)
+                point.label.x = circle.x + (circle.r + _boost) * Math.cos(point.label.angle),
+                point.label.y = circle.y + (circle.r + _boost) * Math.sin(point.label.angle)
 
                 return point;
             }
@@ -214,10 +212,18 @@ function defineClusters (_points, _container, _threshold) {
             });
 
             function finessePoints (points) {
+                variance = _variance ? _variance : Math.PI / 10;
+
                 for (var i = 0; i < points.length; i++) {
                     if (points[i].label.angle && i < points.length - 1) {
-                        if (points[i+1].label.angle - points[i].label.angle < Math.PI / 12) {
-                            points[i+1].label.angle += Math.PI / 12 - (points[i+1].label.angle - points[i].label.angle);
+                        if (points[i+1].label.angle - points[i].label.angle < variance) {
+                            if (points[i - 1]) {
+                                points[i - 1].label.angle -= variance / 2 - (points[i+1].label.angle - points[i].label.angle);
+                                points[i + 1].label.angle += variance / 2 - (points[i+1].label.angle - points[i].label.angle);
+                            } else {
+                                points[i + 1].label.angle += variance - (points[i+1].label.angle - points[i].label.angle);
+                            }
+
                             console.log("finesse")
                         }
                     }
