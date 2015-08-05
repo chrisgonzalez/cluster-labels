@@ -2,7 +2,7 @@
 
 function defineClusters (_points, _container, _threshold,  _boost, _variance) {
 
-    var container = jbone('.container');
+    var container = _container ? jbone(_container) : jbone('.container');
 
     if (container.length === 0) {
         console.error("CLUSTERS ERROR- DOM Selector for your containment did not work! Try again.");
@@ -15,7 +15,7 @@ function defineClusters (_points, _container, _threshold,  _boost, _variance) {
 
     _boost = _boost ? _boost : 20;
 
-    // Function to return the euclidian distance between each place
+    // Function to return the euclidian distance between each point
 
     function distance (d1, d2) {
         var total = 0;
@@ -214,20 +214,24 @@ function defineClusters (_points, _container, _threshold,  _boost, _variance) {
             function finessePoints (points) {
                 variance = _variance ? _variance : Math.PI / 10;
 
-                for (var i = 0; i < points.length; i++) {
-                    if (points[i].label.angle && i < points.length - 1) {
-                        if (points[i+1].label.angle - points[i].label.angle < variance) {
-                            if (points[i - 1]) {
-                                points[i - 1].label.angle -= variance / 2 - (points[i+1].label.angle - points[i].label.angle);
-                                points[i + 1].label.angle += variance / 2 - (points[i+1].label.angle - points[i].label.angle);
-                            } else {
-                                points[i + 1].label.angle += variance - (points[i+1].label.angle - points[i].label.angle);
-                            }
+                function onceAround() {
+                    for (var i = 0; i < points.length; i++) {
+                        if (points[i].label.angle && i < points.length - 1) {
+                            if (points[i+1].label.angle - points[i].label.angle < variance) {
+                                if (points[i - 1]) {
+                                    points[i - 1].label.angle -= variance / 2 - (points[i+1].label.angle - points[i].label.angle);
+                                    points[i + 1].label.angle += variance / 2 - (points[i+1].label.angle - points[i].label.angle);
+                                } else {
+                                    points[i + 1].label.angle += variance - (points[i+1].label.angle - points[i].label.angle);
+                                }
 
-                            console.log("finesse")
+                                console.log("finesse")
+                            }
                         }
                     }
                 }
+
+                onceAround();
             }
 
             cluster.points.sort(function (a, b) {

@@ -211,7 +211,7 @@ function renderClusters (_clusters) {
 
 domready(function () {
     var points = createPoints();
-    clusters = defineClusters(points)
+    clusters = defineClusters(points, '.viz')
 
     renderClusters(clusters);
     // renderPoints(points);
