@@ -34,7 +34,7 @@ function createPoints () {
 
     var container, width, height;
 
-    container = jbone('.container');
+    container = jbone('.viz');
 
     var clientRect = container[0].getBoundingClientRect();
     width = clientRect.width;
@@ -67,7 +67,7 @@ function createPoints () {
 function renderClusters (_clusters) {
     var container, width, height;
 
-    container = jbone('.container');
+    container = jbone('.viz');
 
     var clientRect = container[0].getBoundingClientRect();
     width = clientRect.width;
@@ -77,7 +77,7 @@ function renderClusters (_clusters) {
         return cluster.points.length > 1;
     })
 
-    var circles = d3.select('.container').selectAll('.circle').data(actualClusters);
+    var circles = d3.select('.viz').selectAll('.circle').data(actualClusters);
 
     circles.enter()
         .append('div')
@@ -99,7 +99,7 @@ function renderClusters (_clusters) {
         })
         .each(function (d) {
             if (d.adjusted) {
-                d3.select('.container')
+                d3.select('.viz')
                     .append('div')
                     .attr('class', 'circle adjusted')
                     .style('top', function () {
@@ -136,9 +136,9 @@ function renderClusters (_clusters) {
     circles.exit()
         .remove();
 
-    d3.select('.container').append('svg');
+    d3.select('.viz').append('svg');
 
-    var clusters = d3.select('.container svg').selectAll('.cluster').data(_clusters);
+    var clusters = d3.select('.viz svg').selectAll('.cluster').data(_clusters);
 
     clusters.enter()
         .append('g')

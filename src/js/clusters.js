@@ -2,7 +2,7 @@
 
 function defineClusters (_points, _container, _threshold,  _boost, _variance) {
 
-    var container = _container ? jbone(_container) : jbone('.container');
+    var container = _container ? jbone(_container) : jbone('body');
 
     if (container.length === 0) {
         console.error("CLUSTERS ERROR- DOM Selector for your containment did not work! Try again.");
